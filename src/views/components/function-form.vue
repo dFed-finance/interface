@@ -11,7 +11,7 @@
           type="number"
           class-name="flex-1"
           min=""
-          :max="Number(formData.balance)"
+          :max="maxDisabled ? null : Number(formData.balance)"
           :placeholder="inputPlaceholder"
           @inputFocus="inputFocus"
         />
@@ -53,6 +53,9 @@ export default class FunctionForm extends Vue{
 
   @Prop({default:''})
   disabledAddress
+
+  @Prop({default:false})
+  maxDisabled
 
   @Prop({default:'0.0'})
   inputPlaceholder
