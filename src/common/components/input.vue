@@ -5,6 +5,7 @@
     :type="type"
     :placeholder="placeholder"
     :class="className"
+    ref="input"
     @focus="handleFocus"
     @blur="handleBlur"
   />
@@ -45,7 +46,12 @@ export default class FeInput extends Vue{
 
   @Watch('val')
   valChange(nval){
-    this.$emit('input',nval)
+    console.log(nval)
+    if(/e/g.test(nval)){
+      this.$message.error('Scientific notation is not supported. Please use plain numbers.')
+    }else{
+      this.$emit('input',nval)
+    }
   }
 
   @Watch('value')
@@ -67,10 +73,10 @@ export default class FeInput extends Vue{
     const val = this.val === '' ? this.val : Number(this.val);
     if(this.isRequire && val === ''){
       this.val = this.defaultValue || this.min
-    }else if(val < 0){
-      this.val = Math.abs(this.val)
     }else if(val < this.min){
       this.val = this.defaultValue || this.min
+    }else if(val < 0){
+      this.val = Math.abs(this.val)
     }else if(val > this.max){
       this.val = this.defaultValue || this.max
     }
