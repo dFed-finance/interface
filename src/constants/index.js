@@ -18,6 +18,9 @@ export const FEE_BASE = 10000
 // Supported networkid
 export const SUPPORT_CHAIN = '0x3'
 
+// Infura
+export const INFURA_ID = "4e81fdc27f174967a3af57ac2d855f1e"
+
 // Corresponding to contract
 export const INIT_CODE_HASH = '0x1e13bfabd55c4a55728b1a04dd97db523e33af14aecddc9520af09c0853c78f7'
 

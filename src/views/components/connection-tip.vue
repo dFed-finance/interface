@@ -15,13 +15,25 @@
           <li
             class="flex-row-between-center m_b20"
             :class="{active:true}"
-            @click="handleConnect"
+            @click="handleConnect('metamask')"
           >
             <span>
               <span class="status" :class="currentAccount ? 'open':'close'" />
               MetaMask
             </span>
             <icon name="metamask" class-name="f_s18" />
+          </li>
+
+          <li
+            class="flex-row-between-center m_b20"
+            :class="{active:true}"
+            @click="handleConnect('walletconnect')"
+          >
+            <span>
+              <span class="status" :class="currentAccount ? 'open':'close'" />
+              WalletConnect
+            </span>
+            <icon name="walletconnect" class-name="f_s18" />
           </li>
         </ul>
         <p class="m_t10 text-center color-666">Note: Please select the right network.</p>
@@ -51,11 +63,10 @@ export default class ConnectionTip extends Vue {
   connectLoading
 
 
-  handleConnect() {
-    connectWallet(response => {}).catch(err => {
-      // the error message is string, handle error here!
+  handleConnect(walletType = 'metamask') {
+    connectWallet(walletType).catch(err => {
       console.error(err);
-    });
+    })
   }
 }
 </script>

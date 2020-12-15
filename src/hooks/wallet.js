@@ -1,16 +1,39 @@
 
 import { getUSDDContract, getPairContract } from './contract'
-import { INDEX_ADDRESS, USDD_ADDRESS } from '../constants/index'
+import { INDEX_ADDRESS, USDD_ADDRESS, INFURA_ID } from '../constants/index'
 import { getProviderOrSigner } from '../utils/index'
 import Jazzicon from 'jazzicon'
+import WalletConnectProvider from "@walletconnect/web3-provider";
+import { WALLET_TYPE } from '../constants/wallet'
 
 export function getIcon(account) {
   return Jazzicon(16, parseInt(account.slice(2, 10), 16))
 }
 
+function metaMaskProvider() {
+  return window.ethereum;
+}
+
+function walletConnectProvider() {
+  return new WalletConnectProvider({
+    infuraId: INFURA_ID
+  });
+}
+
 // If error return the error message
-export function connectWallet() {
-  const provider = window.ethereum
+export async function connectWallet(walletType) {
+  let provider;
+  switch (walletType) {
+    case WALLET_TYPE.MetaMask:
+      provider = metaMaskProvider();
+      break;
+    case WALLET_TYPE.WalletConnect:
+      provider = walletConnectProvider();
+      await provider.enable();
+      break;
+    default:
+      provider = metaMaskProvider();
+  }
   if (provider) {
     return new Promise((resolve, reject) => {
       provider.request({ method: 'eth_requestAccounts' }).then((response) => {

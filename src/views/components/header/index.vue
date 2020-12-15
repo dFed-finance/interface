@@ -130,8 +130,13 @@ export default class Header extends Vue {
     });
   }
 
-  handleConnect() {
-    connectWallet().then(response => {
+  handleConnect(walletType) {
+    // 这里需要通过判断 得出defaultWallet的值
+    const defaultWallet = 'walletconnct';
+    // 这里需要给 walletType 参数做赋值操作，
+    // 因为header只有一个链接按钮，需要通过代码判断点击后连接哪个钱包
+    walletType = walletType || defaultWallet; // 点击事件没传walletType，所以是undefined，取defaultWallet的值
+    connectWallet(walletType).then(response => {
       getChainId().then(chainId => {
         this.setChainId(chainId);
       })
