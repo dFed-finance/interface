@@ -91,12 +91,6 @@ export default class ConnectionTip extends Vue {
     connector.on(ConnectorEvents.Deactivate, this.deactivate);
     connector.on(ConnectorEvents.Error, this.error);
 
-    // connect to wallet
-    // await connector.activate().catch(e => {
-    //   console.error("Failed to get connector:", e)
-    //   connector.deactivate();
-    // });
-
     const account = await connector.getAccount()
     const chainId = await connector.getChainId()
 
