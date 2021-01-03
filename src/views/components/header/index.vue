@@ -6,7 +6,7 @@
     </div>
     <div class="account-and-setting">
 
-      <el-tag type="warning" class="balance-fed m_b5 m_r10">{{balanceFed}} {{FEDNAME}}</el-tag>
+      <el-tag v-if="currentAccount" type="warning" class="balance-fed m_b5 m_r10">{{balanceFed}} {{FEDNAME}}</el-tag>
 
       <el-tag type="success" class="m_b5" v-if="networkName">{{networkName}}</el-tag>
 

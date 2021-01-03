@@ -33,7 +33,7 @@
               <span class="status" :class="currentAccount ? 'open':'close'" />
               WalletConnect
             </span>
-            <icon name="walletconnect" class-name="f_s18" />
+            <img class="wallet-img" src="~assets/img/wallet-connect.png" />
           </li>
         </ul>
         <p class="m_t10 text-center color-666">Note: Please select the right network.</p>
@@ -140,6 +140,9 @@ export default class ConnectionTip extends Vue {
     }
     &.active{
       background: $lightBorderColor;
+    }
+    .wallet-img{
+      width: 20px;
     }
     .status{
       display: inline-block;
