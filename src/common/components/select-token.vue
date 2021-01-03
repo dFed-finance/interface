@@ -44,17 +44,18 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { namespace } from "vuex-class";
 import { getTokenDetails, getAllToken } from '../../hooks/token'
-import { getNetworkId } from '../../hooks/wallet'
 import { storeToken } from '../../utils/storage'
 import { STORE_TRACKED_TOKENS } from '../../constants/index'
 
 const moduleBase = namespace("moduleBase");
+const moduleWallet = namespace("moduleWallet")
 
 @Component({
   components: {}
 })
 export default class SelectToken extends Vue{
   @moduleBase.Mutation("setAllTokenList") setAllTokenList;
+  @moduleWallet.State("chainId") chainId;
 
   @Prop({default:false})
   disabled
@@ -93,7 +94,7 @@ export default class SelectToken extends Vue{
 
   @Watch('keyword')
   changeKeword(val){
-    const networkId = getNetworkId()
+    const networkId = this.chainId
     if(/^(0x)[0-9a-fA-F]{40}$/.test(val)){
       getTokenDetails(networkId, val).then(result => {
         storeToken(STORE_TRACKED_TOKENS, result, networkId)

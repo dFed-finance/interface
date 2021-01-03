@@ -1,3 +1,4 @@
+import { shortenAddress } from "../../utils/index";
 const getters = {
   chainName(state) {
     switch (Number(state.chainId)) {
@@ -20,6 +21,13 @@ const getters = {
 
   chainIdNumber(state) {
     return parseInt(state.chainId.toString())
+  },
+
+  shortAddress(state) {
+    if(state.hasConnected) {
+      return shortenAddress(state.currentAccount)
+    }
+    return "";
   }
 }
 

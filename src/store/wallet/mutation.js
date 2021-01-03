@@ -3,7 +3,7 @@ export const mutations = {
     state.hasMetaMask = payload
   },
 
-  chainId(state, payload) {
+  setChainId(state, payload) {
     state.chainId = payload
   },
 
@@ -11,15 +11,20 @@ export const mutations = {
     state.provider = payload
   },
 
-  connected(state, payload) {
+  setConnected(state, payload) {
     state.hasConnected = payload
   },
 
-  account(state, payload) {
+  setAccount(state, payload) {
     state.currentAccount = payload
   },
 
   error(state, payload) {
     state.errorMessage = payload
+  },
+
+  setCurrentWallet(state, payload) {
+    state.currentWallet = payload
   }
 }
+

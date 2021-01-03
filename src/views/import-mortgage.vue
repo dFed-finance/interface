@@ -36,7 +36,6 @@ import PageTitle from "components/page-title.vue";
 import SelectToken from "components/select-token.vue";
 import { Token } from "@uniswap/sdk";
 import { getUSDDTokenStatic, getPairFromToken } from "../hooks/token";
-import { getNetworkId } from "../hooks/wallet";
 import { getAllDebt } from "../hooks/debt";
 import { storeToken } from "../utils/storage";
 import { STORE_DEBTS } from "../constants/index";
@@ -53,6 +52,7 @@ const moduleBase = namespace("moduleBase");
 export default class ImportMortgage extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("allTokenList") allTokenList;
+  @moduleWallet.State("chainId") chainId;
 
   loading = false;
   mortgageCount = 0;
@@ -68,7 +68,7 @@ export default class ImportMortgage extends Vue {
   };
 
   created() {
-    this.usddToken = getUSDDTokenStatic();
+    this.usddToken = getUSDDTokenStatic(this.chainId);
   }
 
   handleClickToLink(){
@@ -83,7 +83,7 @@ export default class ImportMortgage extends Vue {
   }
 
   async changeToken(token) {
-    const networkId = getNetworkId();
+    const networkId = this.chainId;
     this.otherToken = new Token(
       networkId,
       token.address,
@@ -94,7 +94,7 @@ export default class ImportMortgage extends Vue {
     this.loading = true
     const pair = await getPairFromToken(this.usddToken, this.otherToken);
     const pairAddress = pair.liquidityToken.address;
-    getAllDebt(pairAddress, token).then(debtInfo => {
+    getAllDebt(this.chainId, pairAddress, token).then(debtInfo => {
       const userDebts = debtInfo.getUserDebts(this.currentAccount)
       this.mortgageCount = userDebts.length;
       if (this.mortgageCount > 0) {

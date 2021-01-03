@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import UncheckedJsonRpcSigner from './signer'
 import TokenAmount from '../hooks/types/tokenAmount'
 
 const ETHERSCAN_PREFIXES = {
@@ -82,18 +81,6 @@ export function shortenAddress(address, digits = 4) {
 
 export function calculateGasMargin(value) {
   return value.mul(ethers.BigNumber.from(10000).add(ethers.BigNumber.from(1000))).div(ethers.BigNumber.from(10000))
-}
-
-function getDefaultProvider() {
-  if (!window.ethereum && !window.ethereum.isMetaMask) {
-    throw new Error('No wallet found')
-  }
-  return new ethers.providers.Web3Provider(window.ethereum)
-}
-
-export function getProviderOrSigner(singer = false) {
-  const library = getDefaultProvider()
-  return singer ? new UncheckedJsonRpcSigner(library.getSigner()) : library
 }
 
 export function tryParseAmount(value, token){

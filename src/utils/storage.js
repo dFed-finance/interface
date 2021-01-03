@@ -1,7 +1,9 @@
 import { INIT_DATA, DEFAULT_TOLERANCE, DEFAULT_DEADLINE } from '../constants/index'
+import { WALLET_TYPE } from '../constants/wallet'
 
 const toleranceKey = "dfed_tolerance"
 const deadlineKey = "dfed_deadline"
+const walletKey = "dfed_wallet"
 
 
 export function storeToken(key, token, chainId) {
@@ -66,4 +68,20 @@ export function getDeadline() {
 export function setDeadline(val) {
   const storage = localStorage
   storage.setItem(deadlineKey, val)
+}
+
+export function setWallet(val) {
+  const storage = localStorage
+  storage.setItem(walletKey, val)
+}
+
+export function getWallet() {
+  const storage = localStorage
+  const cur = storage.getItem(walletKey)
+  if (cur === null) {
+    storage.setItem(walletKey, WALLET_TYPE.Unknown)
+    return WALLET_TYPE.Unknown
+  } else {
+    return cur
+  }
 }

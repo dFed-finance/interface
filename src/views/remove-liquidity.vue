@@ -96,7 +96,7 @@ import { Percent } from "@uniswap/sdk";
 import TokenAmount from "../hooks/types/tokenAmount";
 import Pair from "../hooks/types/pair";
 import { splitSignature } from "@ethersproject/bytes";
-import { signPermitMessage, getNetworkId } from "../hooks/wallet";
+import { signPermitMessage } from "../hooks/wallet";
 import {
   timeTo,
   getEtherscanLink,
@@ -130,6 +130,7 @@ export default class RemoveLiquidity extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("tolerance") tolerance;
   @moduleBase.State("deadline") deadline;
+  @moduleWallet.State("chainId") chainId;
 
   loading = true;
   FEDNAME = FEDNAME;
@@ -215,7 +216,7 @@ export default class RemoveLiquidity extends Vue {
     this.exchangeValue1 = this.pair.priceOf(this.usddToken).toSignificant();
     this.exchangeValue2 = this.pair.priceOf(this.otherToken).toSignificant();
 
-    getAllDebt(this.pair.liquidityToken.address, this.otherToken).then(
+    getAllDebt(this.chainId, this.pair.liquidityToken.address, this.otherToken).then(
       result => {
         this.debtInfo = result;
         this.loading = false;
@@ -288,7 +289,7 @@ export default class RemoveLiquidity extends Vue {
     const message = {
       tokenName: this.pair.liquidityToken.symbol,
       version: "1",
-      chainId: getNetworkId().toString(),
+      chainId: this.chainId.toString(),
       tokenAddress: this.pair.liquidityToken.address,
       owner: this.currentAccount,
       value: this.rawLiquid.toString(),
@@ -336,7 +337,7 @@ export default class RemoveLiquidity extends Vue {
     );
 
     // remove
-    const network = getNetworkId();
+    const network = this.chainId;
     this.btnLoading = true;
     removeLiquidityWithPermits(
       network,

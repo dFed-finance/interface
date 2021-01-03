@@ -18,9 +18,9 @@
         @click="handleConnect"
       >Connect to a wallet</el-button>
       <span class="c_pointer account m_b5">
-        <el-tag class="ellipsis m_l10 w_max150" v-if="hasConnected&&currentAccount">
+        <el-tag class="ellipsis m_l10 w_max150" v-if="hasConnected">
           <div id="clipboard-btn"  :data-clipboard-text="currentAccount">
-            {{parsedAddress}}
+            {{address}}
             <span ref="icon" class="account-icon"></span>
           </div>
           <span class="tip">{{copyTipMsg}}</span>
@@ -38,11 +38,10 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import Clipboard from 'clipboard';
-import { connectWallet, getIcon, getChainId } from "hooks/wallet";
+import { getIcon } from "hooks/wallet";
 import Setting from "./setting.vue";
 import Menu from "./menu.vue";
 import { FED_ADDRESS, FEDNAME} from "constants/index";
-import { shortenAddress } from "../../../utils/index";
 import { getTokenBalance, getFedTokenStatic } from "../../../hooks/token"
 import TokenAmount from '../../../hooks/types/tokenAmount'
 
@@ -59,7 +58,7 @@ export default class Header extends Vue {
   @moduleWallet.State("chainId") chainId;
   @moduleWallet.State("errorMessage") errorMessage;
   @moduleWallet.State("currentAccount") currentAccount;
-  @moduleWallet.State("hasConnected") hasConnected;
+  @moduleWallet.Getter("shortAddress") shortAddress;
   @moduleWallet.Mutation("chainId") setChainId;
 
   FEDNAME = FEDNAME
@@ -67,8 +66,12 @@ export default class Header extends Vue {
   copyTipMsg = "Copy to clipboard"
   balanceFed = 0
 
-  get parsedAddress() {
-    return shortenAddress(this.currentAccount);
+  get hasConnected() {
+    return this.currentAccount !== "";
+  }
+
+  get address() {
+    return this.hasConnected ? this.shortAddress : "";
   }
 
   @Watch("errorMessage")
@@ -103,7 +106,7 @@ export default class Header extends Vue {
   async getFed() {
     if(this.currentAccount){
       const fed = await getTokenBalance(FED_ADDRESS, this.currentAccount);
-      const fedTokenAmount = new TokenAmount(getFedTokenStatic(), fed);
+      const fedTokenAmount = new TokenAmount(getFedTokenStatic(this.chainId), fed);
       this.balanceFed = fedTokenAmount.toSignificant()
     }
   }
@@ -131,20 +134,7 @@ export default class Header extends Vue {
   }
 
   handleConnect(walletType) {
-    // 这里需要通过判断 得出defaultWallet的值
-    const defaultWallet = 'walletconnct';
-    // 这里需要给 walletType 参数做赋值操作，
-    // 因为header只有一个链接按钮，需要通过代码判断点击后连接哪个钱包
-    walletType = walletType || defaultWallet; // 点击事件没传walletType，所以是undefined，取defaultWallet的值
-    connectWallet(walletType).then(response => {
-      getChainId().then(chainId => {
-        this.setChainId(chainId);
-      })
-    }).catch(err => {
-      // the error message is string, handle error here!
-      this.$message.error("Failed to connect to wallet")
-      console.error(err);
-    });
+    // This func should show the wallet tip page
   }
 }
 </script>

@@ -31,7 +31,7 @@ import Loading from "components/loading.vue";
 import LendList from "./components/lend/lend-list.vue";
 import { getToken } from "../utils/storage";
 import { STORE_DEBTS } from "../constants/index";
-import { getNetworkId, signPermitMessage } from "../hooks/wallet";
+import { signPermitMessage } from "../hooks/wallet";
 import { Token, JSBI } from "@uniswap/sdk";
 import { getUSDDTokenStatic, getPairFromToken } from "../hooks/token";
 import { getAllDebt, repay } from "../hooks/debt";
@@ -51,6 +51,7 @@ const moduleBase = namespace("moduleBase");
 export default class Lend extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("deadline") deadline;
+  @moduleWallet.State("chainId") chainId;
 
   loading = true;
   lendListData = [];
@@ -60,7 +61,7 @@ export default class Lend extends Vue {
 
   async created() {
     this.loading = true;
-    const networkId = getNetworkId();
+    const networkId = this.chainId;
     // Tokens from user's local cache
     const allTrackedTokens = getToken(STORE_DEBTS)[networkId];
     if (!allTrackedTokens || allTrackedTokens.length === 0) {
@@ -79,10 +80,10 @@ export default class Lend extends Vue {
     });
 
     for (const token of parsedTokens) {
-      const usdd = getUSDDTokenStatic();
+      const usdd = getUSDDTokenStatic(this.chainId);
       const pair = await getPairFromToken(usdd,token)
       const pairAddress = pair.liquidityToken.address;
-      getAllDebt(pairAddress, token).then(debtInfo => {
+      getAllDebt(this.chainId, pairAddress, token).then(debtInfo => {
         const userDebts = debtInfo.getUserDebts(this.currentAccount)
         for (const d of userDebts) {
           const repayVal = JSBI.add(d.repayAmount.raw, d.debtToken0Amount.raw)
@@ -119,7 +120,7 @@ export default class Lend extends Vue {
     }
     this.$set(data,'btnStatus',3)
     repay(
-      getNetworkId(),
+      this.chainId,
       data.tokenAddress,
       data.id,
       data.permitValue,
@@ -130,7 +131,7 @@ export default class Lend extends Vue {
     )
       .then(res => {
         this.$set(data,'btnStatus',4)
-        const url = getEtherscanLink(getNetworkId(), res.hash);
+        const url = getEtherscanLink(this.chainId, res.hash);
         etherscanMessage.call(this, url, () => {
           this.$router.back();
         });
@@ -143,11 +144,11 @@ export default class Lend extends Vue {
 
   handleApproveCallback(data) {
     this.$set(data,'btnStatus',1)
-    const usdd = getUSDDTokenStatic();
+    const usdd = getUSDDTokenStatic(this.chainId);
     const message = {
       tokenName: usdd.name,
       version: "1",
-      chainId: getNetworkId().toString(),
+      chainId: this.chainId.toString(),
       tokenAddress: usdd.address,
       owner: this.currentAccount,
       value: data.permitValue,

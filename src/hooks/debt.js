@@ -9,8 +9,8 @@ import { MaxUint256 } from '@ethersproject/constants'
 
 
 // Get all debts data
-export async function getAllDebt(pairAddress, token) {
-  const USDD = getUSDDTokenStatic()
+export async function getAllDebt(chainId, pairAddress, token) {
+  const USDD = getUSDDTokenStatic(chainId)
   const dataMap = new Map()
   const contract = getPairContract(pairAddress)
   const logs = await contract.queryFilter("DebtUpdate")

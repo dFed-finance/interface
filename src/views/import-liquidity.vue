@@ -70,7 +70,6 @@ import SelectToken from "components/select-token.vue";
 import { Token, Percent } from "@uniswap/sdk";
 import TokenAmount from '../hooks/types/tokenAmount'
 import { getUSDDTokenStatic, getPairFromToken } from "../hooks/token";
-import { getNetworkId } from "../hooks/wallet";
 import { getPair, getTotalSupply, getPoolTokenBalance, getCredit } from "../hooks/liquid";
 import { ZERO_ADDRESS, STORE_TRACKED_TOKENS } from "../constants/index";
 import { storeToken } from "../utils/storage";
@@ -88,6 +87,7 @@ const moduleBase = namespace("moduleBase");
 export default class ImportLiquidity extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("allTokenList") allTokenList;
+  @moduleWallet.State("chainId") chainId;
 
   usddToken = {
     symbol: "USDD",
@@ -108,12 +108,12 @@ export default class ImportLiquidity extends Vue {
   otherAmount = 0;
 
   created() {
-    this.tokenA = getUSDDTokenStatic();
+    this.tokenA = getUSDDTokenStatic(this.chainId);
   }
 
   async changeToken(token) {
     this.loading = true;
-    const networkId = getNetworkId();
+    const networkId = this.chainId;
     this.otherToken = new Token(
       networkId,
       token.address,
@@ -121,7 +121,7 @@ export default class ImportLiquidity extends Vue {
       token.symbol,
       token.name
     );
-    this.usddToken = getUSDDTokenStatic();
+    this.usddToken = getUSDDTokenStatic(this.chainId);
     const pairAddress = await getPair(
       networkId,
       this.otherToken.address

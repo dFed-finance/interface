@@ -62,7 +62,6 @@ import FunctionForm from "./components/function-form.vue";
 import MintBar from "./components/lend/mint-bar.vue";
 import DescComponent from "components/desc-component.vue";
 import { mortgage, getAllDebt, getUSDDYMapping } from "../hooks/debt";
-import { getNetworkId } from "../hooks/wallet";
 import TokenAmount from "../hooks/types/tokenAmount";
 import {
   timeTo,
@@ -104,6 +103,7 @@ export default class Lend extends Vue {
   @moduleBase.State("allTokenList") allTokenList;
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("deadline") deadline;
+  @moduleWallet.State("chainId") chainId;
 
   loading = false;
   USDDReserve = 0;
@@ -140,11 +140,11 @@ export default class Lend extends Vue {
     this.loading = true;
     this.clear();
     const tokenAddress = this.formData.address;
-    const token = await getTokenDetails(getNetworkId(), tokenAddress);
+    const token = await getTokenDetails(this.chainId, tokenAddress);
     this.getBalance(token);
     this.otherToken = token;
     this.formData.symbol = token.symbol;
-    this.usddToken = getUSDDTokenStatic();
+    this.usddToken = getUSDDTokenStatic(this.chainId);
     this.createPair(() => {
       this.loading = false;
       this.dropsValue = 0;
@@ -179,7 +179,7 @@ export default class Lend extends Vue {
   }
 
   createPair(cb) {
-    getPair(getNetworkId(), this.otherToken.address)
+    getPair(this.chainId, this.otherToken.address)
       .then(pairAddress => {
         if (pairAddress.toLowerCase() === ZERO_ADDRESS) {
           this.$message.error("Pair not found");
@@ -192,7 +192,7 @@ export default class Lend extends Vue {
             this.USDDReserve = Number(pair.reserve0.toSignificant(8));
             this.formData.reserve = Number(pair.reserve1.toSignificant(8));
             this.k = Number(this.USDDReserve) * Number(this.formData.reserve);
-            getAllDebt(pairAddress, this.otherToken).then(debtInfo => {
+            getAllDebt(this.chainId, pairAddress, this.otherToken).then(debtInfo => {
               const list = getUSDDYMapping(
                 this.pair.reserve0,
                 this.pair.reserve1,
@@ -422,7 +422,7 @@ export default class Lend extends Vue {
     const deadline = timeTo(Number(this.deadline * 60));
     this.btnLoading = true;
     mortgage(
-      getNetworkId(),
+      this.chainId,
       this.otherToken.address,
       pladgeAmount.raw.toString(),
       targetAmount.raw.toString(),
@@ -430,8 +430,8 @@ export default class Lend extends Vue {
       deadline
     )
       .then(result => {
-        storeToken(STORE_DEBTS, this.otherToken, getNetworkId());
-        const url = getEtherscanLink(getNetworkId(), result.hash);
+        storeToken(STORE_DEBTS, this.otherToken, this.chainId);
+        const url = getEtherscanLink(this.chainId, result.hash);
         etherscanMessage.call(this, url, () => {
           this.$router.back();
         });

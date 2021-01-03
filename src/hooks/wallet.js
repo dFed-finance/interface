@@ -1,62 +1,43 @@
-
 import { getUSDDContract, getPairContract } from './contract'
-import { INDEX_ADDRESS, USDD_ADDRESS, INFURA_ID } from '../constants/index'
-import { getProviderOrSigner } from '../utils/index'
+import { INDEX_ADDRESS, USDD_ADDRESS } from '../constants/index'
 import Jazzicon from 'jazzicon'
-import WalletConnectProvider from "@walletconnect/web3-provider";
+import UncheckedJsonRpcSigner from "./signer"
+// import WalletConnectProvider from "@walletconnect/web3-provider";
 import { WALLET_TYPE } from '../constants/wallet'
+import { walletconnect, injected } from "../connector/index";
+import { providers } from "ethers";
+
+let connector;
+let provider = null;
 
 export function getIcon(account) {
   return Jazzicon(16, parseInt(account.slice(2, 10), 16))
 }
 
-function metaMaskProvider() {
-  return window.ethereum;
-}
-
-function walletConnectProvider() {
-  return new WalletConnectProvider({
-    infuraId: INFURA_ID
-  });
-}
-
 // If error return the error message
-export async function connectWallet(walletType) {
-  let provider;
+export async function connectWallet(walletType, callAccountsChanged, callChainChanged, callDisconnect) {
+  let abstracConnector;
+  // instance a wallet
   switch (walletType) {
     case WALLET_TYPE.MetaMask:
-      provider = metaMaskProvider();
+      abstracConnector = injected;
       break;
     case WALLET_TYPE.WalletConnect:
-      provider = walletConnectProvider();
-      await provider.enable();
+      abstracConnector = walletconnect;
       break;
     default:
-      provider = metaMaskProvider();
   }
-  if (provider) {
-    return new Promise((resolve, reject) => {
-      provider.request({ method: 'eth_requestAccounts' }).then((response) => {
-        resolve(response)
-      }).catch((err) => {
-        switch (err.code) {
-          case 4001: case -32602: case -32603:
-            reject(err.message)
-            break
-          default:
-            reject(new Error('Unknown error'))
-            break
-        }
-      })
-    })
-  } else {
-    return new Promise((resolve, reject) => {
-      reject(new Error('No wallet found'))
-    })
-  }
+  connector = abstracConnector;
+  // connet to wallet
+  await connector.activate()
+  provider = await connector.getProvider()
+  // get web3Provider
+  provider = new providers.Web3Provider(provider);
+  return connector;
 }
 
 export function getChainId() {
+  console.log(connector.getChainId())
   const provider = window.ethereum
   return provider.request({ method: 'eth_chainId' })
 }
@@ -109,8 +90,16 @@ export async function signPermitMessage({ tokenName, version, chainId, tokenAddr
   return signer.send('eth_signTypedData_v4', [owner, data])
 }
 
-export function getNetworkId() {
-  return Number(window.ethereum.networkVersion)
+function getDefaultProvider() {
+  if (provider === null) {
+    throw new Error('No wallet found')
+  }
+  return provider
+}
+
+export function getProviderOrSigner(singer = false) {
+  const library = getDefaultProvider()
+  return singer ? new UncheckedJsonRpcSigner(library.getSigner()) : library
 }
 
 

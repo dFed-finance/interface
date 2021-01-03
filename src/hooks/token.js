@@ -3,26 +3,26 @@ import Pair from './types/pair'
 import ERC20_ABI from '../constants/abis/erc20'
 import ERC20_BYTES32_ABI from '../constants/abis/erc20_bytes32'
 import { USDD_ADDRESS, USDT_ADDRESS, FED_ADDRESS, FEDNAME, FED_DECIMALS, APPROVE_MAX, USDX_DECIMALS } from '../constants/index'
-import { isAddress, getProviderOrSigner, calculateGasMargin, tryParseAmount } from '../utils/index'
+import { isAddress, calculateGasMargin, tryParseAmount } from '../utils/index'
 import { getContract, getFactoryContract, getPairContract, getTokenContract, getUSDDContract } from './contract'
 import { Token } from '@uniswap/sdk'
 import TokenAmount from '../hooks/types/tokenAmount'
-import { getNetworkId } from './wallet'
+import { getProviderOrSigner } from './wallet'
 import { MaxUint256 } from '@ethersproject/constants'
 
 // Get USDD token object without network.
-export function getUSDDTokenStatic() {
-  return new Token(getNetworkId(), USDD_ADDRESS, USDX_DECIMALS, 'USDD', 'USDD')
+export function getUSDDTokenStatic(chainId) {
+  return new Token(chainId, USDD_ADDRESS, USDX_DECIMALS, 'USDD', 'USDD')
 }
 
 // Get USDT token object without network.
-export function getUSDTTokenStatic() {
-  return new Token(getNetworkId(), USDT_ADDRESS, USDX_DECIMALS, 'USDT', 'USDT')
+export function getUSDTTokenStatic(chainId) {
+  return new Token(chainId, USDT_ADDRESS, USDX_DECIMALS, 'USDT', 'USDT')
 }
 
 // Get Fed token object without network.
-export function getFedTokenStatic() {
-  return new Token(getNetworkId(), FED_ADDRESS, FED_DECIMALS, FEDNAME, FEDNAME)
+export function getFedTokenStatic(chainId) {
+  return new Token(chainId, FED_ADDRESS, FED_DECIMALS, FEDNAME, FEDNAME)
 }
 
 // Get token info from network.
@@ -31,7 +31,7 @@ export async function getTokenDetails(chainId = 1, tokenAddress = USDD_ADDRESS) 
     throw new Error('Invalid token address')
   }
   if (tokenAddress === USDD_ADDRESS) {
-    return getUSDDTokenStatic()
+    return getUSDDTokenStatic(chainId)
   }
 
   const name = await getTokenName(tokenAddress).catch(() => null)

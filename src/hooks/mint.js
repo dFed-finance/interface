@@ -1,4 +1,4 @@
-import { getProviderOrSigner } from '../utils/index'
+import { getProviderOrSigner } from '../hooks/wallet'
 import { getFactoryContract, getPairContract } from './contract'
 import { getFedTokenStatic, getUSDDTokenStatic } from './token'
 import { JSBI } from '@uniswap/sdk'

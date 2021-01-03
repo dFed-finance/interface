@@ -6,7 +6,8 @@ import TOKEN_ABI from '../constants/abis/erc20.json'
 import USDD_ABI from '../constants/abis/usdd.json'
 import PAIR_ABI from '../constants/abis/pair'
 import { FACTORY_ADDRESSES, INDEX_ADDRESS } from '../constants'
-import { isAddress, getProviderOrSigner } from '../utils/index'
+import { isAddress } from '../utils/index'
+import { getProviderOrSigner } from '../hooks/wallet'
 
 export function getContract(address, ABI, singer = false) {
   if (!isAddress(address) || address === ethers.constants.AddressZero) {

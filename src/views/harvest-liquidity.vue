@@ -34,7 +34,6 @@ import { Component, Vue } from 'vue-property-decorator'
 import { namespace } from "vuex-class"
 import PageTitle from 'components/page-title.vue'
 import FeInput from 'components/input.vue'
-import { getNetworkId } from "../hooks/wallet";
 import { harvest } from 'hooks/liquid.js'
 import { etherscanMessage, getEtherscanLink, handleError } from 'utils/index.js'
 import {FEDNAME} from "constants/index"
@@ -51,6 +50,7 @@ const moduleLiquidity = namespace("moduleLiquidity")
 export default class Harvest extends Vue{
   @moduleWallet.State('currentAccount') currentAccount
   @moduleLiquidity.State('harvestParams') harvestParams
+  @moduleWallet.State("chainId") chainId;
 
   FEDNAME = FEDNAME
   ajaxLoading = false
@@ -68,7 +68,7 @@ export default class Harvest extends Vue{
   handleClickHarvest(){
     this.ajaxLoading = true;
     harvest(this.harvestParams.pairAddress, this.currentAccount).then(res=>{
-      const url = getEtherscanLink(getNetworkId(), res.hash);
+      const url = getEtherscanLink(this.chainId, res.hash);
       etherscanMessage.call(this,url,()=>{
         this.harvestValue = '';
       })

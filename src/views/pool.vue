@@ -40,7 +40,6 @@ import {
 import HcoFunction from "./components/hco-function";
 import LiquidityList from "./components/liquidity/liquidity-list";
 import Loading from "components/loading.vue";
-import { getNetworkId } from "../hooks/wallet";
 import { getToken } from "../utils/storage";
 import { Token, Percent } from "@uniswap/sdk";
 import TokenAmount from '../hooks/types/tokenAmount'
@@ -68,6 +67,7 @@ const moduleLiquidity = namespace("moduleLiquidity");
 export default class Pool extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleLiquidity.Mutation("setHarvestParams") setHarvestParams;
+  @moduleWallet.State("chainId") chainId;
 
   liquidsDataList = [];
   ajaxLoading = false;
@@ -87,7 +87,7 @@ export default class Pool extends Vue {
 
   async fetchLiquidsData(trackedToken, usddToken) {
     this.ajaxLoading = true;
-    const pairAddress = await getPair(getNetworkId(), trackedToken.address);
+    const pairAddress = await getPair(this.chainId, trackedToken.address);
     if (pairAddress === ZERO_ADDRESS) {
       return;
     }
@@ -107,7 +107,7 @@ export default class Pool extends Vue {
     const creditAmount = new TokenAmount(pair.token0, credit);
 
     const fedTest = await getFed(
-      getNetworkId(),
+      this.chainId,
       pairAddress,
       pair.reserve0.raw,
       totalSupply,
@@ -158,7 +158,7 @@ export default class Pool extends Vue {
   }
 
   async getLiquidsData(currentAccount) {
-    const networkId = getNetworkId();
+    const networkId = this.chainId;
     // Tokens from user's local cache
     const allTrackedTokens = getToken(STORE_TRACKED_TOKENS)[networkId];
     if (!allTrackedTokens) {

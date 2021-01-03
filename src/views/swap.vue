@@ -139,7 +139,7 @@ import {
   getTokenAllowance,
   approveToken
 } from "../hooks/token";
-import { getNetworkId, signPermitMessage } from "../hooks/wallet";
+import { signPermitMessage } from "../hooks/wallet";
 import {
   getPair,
   calculateSlippageAmount
@@ -168,6 +168,7 @@ export default class Swap extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("tolerance") slippageTolerance;
   @moduleBase.State("deadline") deadline;
+  @moduleWallet.State("chainId") chainId;
 
   dialogVisible = false;
   btnLoading = false;
@@ -222,7 +223,6 @@ export default class Swap extends Vue {
   created() {
     this.handleChangeDataFn = debounceFn(this.handleChangeData, 300);
     this.handleTokenDetails(this.currentAccount, USDD_ADDRESS);
-    this.networkId = getNetworkId();
   }
 
   get isBuy() {
@@ -567,7 +567,7 @@ export default class Swap extends Vue {
   handleSell(tokenAddress, inAmount, minOutAmount, to, deadline) {
     waitingMessage.call(this);
     sellToken(
-      this.networkId,
+      this.chainId,
       tokenAddress,
       inAmount,
       minOutAmount,
@@ -600,7 +600,7 @@ export default class Swap extends Vue {
   ) {
     waitingMessage.call(this);
     buyTokenWithPermit(
-      this.networkId,
+      this.chainId,
       tokenAddress,
       inAmount,
       minOutAmount,
@@ -628,7 +628,7 @@ export default class Swap extends Vue {
     this.$msgbox.close();
     setTimeout(()=>{
       this.clear();
-      const url = getEtherscanLink(this.networkId, res.hash);
+      const url = getEtherscanLink(this.chainId, res.hash);
       etherscanMessage.call(this, url, () => {
         window.location.reload()
       });
@@ -644,7 +644,7 @@ export default class Swap extends Vue {
       return;
     }
     this.loading = true;
-    getTokenDetails(this.networkId, addres)
+    getTokenDetails(this.chainId, addres)
       .then(res => {
         if (addres === USDD_ADDRESS) {
           this.usddToken = res;
@@ -698,7 +698,7 @@ export default class Swap extends Vue {
     if (this.usddToken && this.otherToken) {
       this.pairCreated = false;
       this.clear();
-      getPair(this.networkId, this.otherToken.address)
+      getPair(this.chainId, this.otherToken.address)
         .then(pairAddress => {
           if (pairAddress.toLowerCase() === ZERO_ADDRESS) {
             this.$message.error("Pair not found");
@@ -706,6 +706,8 @@ export default class Swap extends Vue {
             return;
           }
           this.pairAddress = pairAddress;
+          console.log(this.usddToken)
+          console.log(this.otherToken)
           getPairFromToken(this.usddToken, this.otherToken, pairAddress).then(
             pair => {
               this.pair = pair;
@@ -733,7 +735,7 @@ export default class Swap extends Vue {
   }
 
   async getDebts() {
-    const debtInfo = await getAllDebt(this.pairAddress, this.otherToken);
+    const debtInfo = await getAllDebt(this.chainId, this.pairAddress, this.otherToken);
     this.debts = debtInfo;
   }
 
@@ -811,7 +813,7 @@ export default class Swap extends Vue {
     const message = {
       tokenName: usdd.name,
       version: "1",
-      chainId: getNetworkId().toString(),
+      chainId: this.chainId.toString(),
       tokenAddress: usdd.address,
       owner: this.currentAccount,
       value: value,

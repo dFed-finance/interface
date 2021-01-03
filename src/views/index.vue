@@ -1,7 +1,5 @@
 <template>
   <div class="app-content clearfix relative">
-    <MetaMask />
-    <Web3Manager />
     <HeaderComponent />
     <ConnectionTip
       v-if="!connectedReady"
@@ -18,31 +16,29 @@
 import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import HeaderComponent from "./components/header/index.vue";
-import MetaMask from "./components/metamask";
-import Web3Manager from "./components/web3manager"
 import ConnectionTip from "./components/connection-tip";
-import { SUPPORT_CHAIN } from "constants/index";
+// import { SUPPORT_CHAIN } from "constants/index";
 
 const moduleWallet = namespace("moduleWallet");
 
 @Component({
   components: {
     HeaderComponent,
-    MetaMask,
-    ConnectionTip,
-    Web3Manager
+    ConnectionTip
   }
 })
 export default class Index extends Vue {
   @moduleWallet.State("chainId") chainId;
   @moduleWallet.State("currentAccount") currentAccount;
+  @moduleWallet.State("hasConnected") hasConnected
 
   get connectedReady() {
-    return Number(SUPPORT_CHAIN) === Number(this.chainId) && this.currentAccount;
+    // return Number(SUPPORT_CHAIN) === Number(this.chainId) && this.currentAccount;
+    return this.hasConnected;
   }
 
   get connectLoading(){
-    return this.chainId === '' || this.currentAccount === '';
+    return this.hasConnected;
   }
 }
 </script>

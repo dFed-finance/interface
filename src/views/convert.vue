@@ -66,7 +66,6 @@ import {
   etherscanMessage,
   handleError
 } from "../utils/index";
-import { getNetworkId } from "../hooks/wallet";
 import { APPROVE_STATE, USDD_ADDRESS } from "../constants/index";
 
 const moduleWallet = namespace("moduleWallet");
@@ -153,8 +152,8 @@ export default class Convert extends Vue {
   }
 
   async created() {
-    const usdd = getUSDDTokenStatic();
-    const usdt = getUSDTTokenStatic();
+    const usdd = getUSDDTokenStatic(this.chainId);
+    const usdt = getUSDTTokenStatic(this.chainId);
     // 获得非稳定币的余额
     const usddBalance = await getTokenBalance(
       usdd.address,
@@ -299,7 +298,7 @@ export default class Convert extends Vue {
   }
 
   etherscan(hash) {
-    const url = getEtherscanLink(getNetworkId(), hash);
+    const url = getEtherscanLink(this.chainId, hash);
     etherscanMessage.call(this, url, () => {
       window.location.reload()
     });

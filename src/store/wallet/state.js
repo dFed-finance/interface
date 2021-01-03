@@ -3,5 +3,6 @@ export const state = {
   hasMetaMask: false,
   chainId: '',
   currentAccount: '',
-  errorMessage: ''
+  errorMessage: '',
+  currentWallet: ''
 };

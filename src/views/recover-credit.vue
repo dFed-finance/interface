@@ -91,7 +91,6 @@ import {
   handleError,
   isSameAddress
 } from "../utils/index";
-import { getNetworkId } from "../hooks/wallet";
 
 const moduleWallet = namespace("moduleWallet");
 const moduleLiquidity = namespace("moduleLiquidity");
@@ -106,6 +105,7 @@ const moduleLiquidity = namespace("moduleLiquidity");
 export default class RecoverCredit extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleLiquidity.State("harvestParams") params;
+  @moduleWallet.State("chainId") chainId;
 
   usddToken = {};
   otherToken = {};
@@ -232,7 +232,7 @@ export default class RecoverCredit extends Vue {
       )
         .then(res => {
           this.etherscan(res.hash);
-          const url = getEtherscanLink(getNetworkId(), res.hash);
+          const url = getEtherscanLink(this.chainId, res.hash);
           etherscanMessage.call(this, url, () => {
             this.$router.back();
           });
@@ -272,7 +272,7 @@ export default class RecoverCredit extends Vue {
       )
         .then(res => {
           this.etherscan(res.hash);
-          const url = getEtherscanLink(getNetworkId(), res.hash);
+          const url = getEtherscanLink(this.chainId, res.hash);
           etherscanMessage.call(this, url, () => {
             this.$router.back();
           });
@@ -288,7 +288,7 @@ export default class RecoverCredit extends Vue {
   }
 
   etherscan(hash) {
-    const url = getEtherscanLink(getNetworkId(), hash);
+    const url = getEtherscanLink(this.chainId, hash);
     etherscanMessage.call(this, url, () => {
       this.$router.back();
     });

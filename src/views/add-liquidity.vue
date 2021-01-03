@@ -131,7 +131,7 @@ import {
   getPair
 } from "../hooks/liquid";
 import { storeToken } from "../utils/storage";
-import { getNetworkId, signPermitMessage } from "../hooks/wallet";
+import { signPermitMessage } from "../hooks/wallet";
 import { splitSignature } from "@ethersproject/bytes";
 
 const moduleWallet = namespace("moduleWallet");
@@ -148,6 +148,7 @@ export default class AddLiquidity extends Vue {
   @moduleWallet.State("currentAccount") currentAccount;
   @moduleBase.State("tolerance") tolerance;
   @moduleBase.State("deadline") deadline;
+  @moduleWallet.State("chainId") chainId;
 
   usddToken;
   otherToken;
@@ -289,14 +290,13 @@ export default class AddLiquidity extends Vue {
     }
     this.getTokenDetails(this.currentAccount, USDD_ADDRESS, "formData1");
     this.handleChangeDataFn = debounceFn(this.handleChangeData, 300);
-    this.networkId = getNetworkId();
   }
 
   createPair() {
     this.hasLiquidity = true;
     if (this.usddToken && this.otherToken) {
       this.clear();
-      getPair(this.networkId, this.otherToken.address)
+      getPair(this.chainId, this.otherToken.address)
         .then(pairAddress => {
           if (pairAddress.toLowerCase() === ZERO_ADDRESS) {
             this.hasLiquidity = false;
@@ -349,7 +349,7 @@ export default class AddLiquidity extends Vue {
       return;
     }
     this.loading = true;
-    getTokenDetails(this.networkId, addres)
+    getTokenDetails(this.chainId, addres)
       .then(res => {
         if (addres === USDD_ADDRESS) {
           this.usddToken = res;
@@ -547,12 +547,12 @@ export default class AddLiquidity extends Vue {
     const splagge = Number(this.tolerance * 100);
     const [inputSplagge] = calculateSlippageAmount(this.inputAmount, splagge);
     const [outputSplagge] = calculateSlippageAmount(this.outputAmount, splagge);
-    storeToken(STORE_TRACKED_TOKENS, this.otherToken, this.networkId);
+    storeToken(STORE_TRACKED_TOKENS, this.otherToken, this.chainId);
 
     waitingMessage.call(this);
 
     addLiquidityWithPermit(
-      this.networkId,
+      this.chainId,
       this.otherToken.address,
       this.inputAmount.raw.toString(),
       this.outputAmount.raw.toString(),
@@ -570,7 +570,7 @@ export default class AddLiquidity extends Vue {
         this.$msgbox.close();
         this.formData1.value = "";
         this.formData2.value = "";
-        const url = getEtherscanLink(this.networkId, result.hash);
+        const url = getEtherscanLink(this.chainId, result.hash);
         etherscanMessage.call(this, url, () => {
           window.location.reload()
         });
@@ -652,11 +652,11 @@ export default class AddLiquidity extends Vue {
   }
 
   permitSign() {
-    const usdd = getUSDDTokenStatic();
+    const usdd = getUSDDTokenStatic(this.chainId);
     const message = {
       tokenName: usdd.name,
       version: "1",
-      chainId: getNetworkId().toString(),
+      chainId: this.chainId.toString(),
       tokenAddress: usdd.address,
       owner: this.currentAccount,
       value: this.inputAmount.raw.toString(),
