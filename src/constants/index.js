@@ -16,11 +16,19 @@ export const FEE = 0
 export const FEE_BASE = 10000
 
 // Supported networkid
-export const SUPPORT_CHAIN = '0x3'
+// MainNet: 1
+// Ropsten: 3
+export const SUPPORT_CHAIN = 1
 
-// Infura
+// MainNet: 1
+// Ropsten: 3
+export const INIT_DATA = {
+  3: []
+}
+
+// Infura ID
+// this is only for testing, change it in product env.
 export const INFURA_ID = "db4133a2e4e04c01919c275eb1a5ce24"
-export const NETWORK_URL = 'https://mainnet.infura.io/v3/db4133a2e4e04c01919c275eb1a5ce24'
 
 // Corresponding to contract
 export const INIT_CODE_HASH = '0x1e13bfabd55c4a55728b1a04dd97db523e33af14aecddc9520af09c0853c78f7'
@@ -36,10 +44,6 @@ export const CREATOR_ADDRESS = '0x29900fffaffefed16fb52a1d04f4d6d8cd469316'
 
 export const STORE_TRACKED_TOKENS = 'tokens'
 export const STORE_DEBTS = 'debts'
-export const INIT_DATA = {
-  3: []
-}
-
 export const APPROVE_STATE = {
   UNKNOWN: 0,
   APPROVING: 1,

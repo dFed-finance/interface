@@ -14,8 +14,14 @@ export function getIcon(account) {
   return Jazzicon(16, parseInt(account.slice(2, 10), 16))
 }
 
+function init() {
+  connector = null;
+  provider = null;
+}
+
 // If error return the error message
-export async function connectWallet(walletType, callAccountsChanged, callChainChanged, callDisconnect) {
+export async function connectWallet(walletType) {
+  init();
   let abstracConnector;
   // instance a wallet
   switch (walletType) {
@@ -29,7 +35,9 @@ export async function connectWallet(walletType, callAccountsChanged, callChainCh
   }
   connector = abstracConnector;
   // connet to wallet
+  console.log(111)
   await connector.activate()
+  console.log(222)
   provider = await connector.getProvider()
   // get web3Provider
   provider = new providers.Web3Provider(provider);

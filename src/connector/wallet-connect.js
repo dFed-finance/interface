@@ -67,10 +67,10 @@ export class WalletConnectConnector extends BaseConnector {
     }
 
     // ensure that the uri is going to be available, and emit an event if there's a new uri
-    // if (!this.walletConnectProvider.wc.connected) {
-    //   await this.walletConnectProvider.wc.createSession({ chainId: Number(Object.keys(this.rpc)[0]) })
-    //   super.emit(URI_AVAILABLE, this.walletConnectProvider.wc.uri)
-    // }
+    if (!this.walletConnectProvider.wc.connected) {
+      await this.walletConnectProvider.wc.createSession({ chainId: Number(Object.keys(this.rpc)[0]) })
+      super.emit(URI_AVAILABLE, this.walletConnectProvider.wc.uri)
+    }
 
     const account = await this.walletConnectProvider
       .enable()
@@ -78,6 +78,7 @@ export class WalletConnectConnector extends BaseConnector {
       .catch(error => {
         // TODO ideally this would be a better check
         if (error.message === 'User closed modal') {
+          this.walletConnectProvider = null;
           throw new UserRejectedRequestError()
         }
 

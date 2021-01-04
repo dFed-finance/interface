@@ -17,7 +17,6 @@ import { Component, Vue } from "vue-property-decorator";
 import { namespace } from "vuex-class";
 import HeaderComponent from "./components/header/index.vue";
 import ConnectionTip from "./components/connection-tip";
-// import { SUPPORT_CHAIN } from "constants/index";
 
 const moduleWallet = namespace("moduleWallet");
 
@@ -33,7 +32,6 @@ export default class Index extends Vue {
   @moduleWallet.State("hasConnected") hasConnected
 
   get connectedReady() {
-    // return Number(SUPPORT_CHAIN) === Number(this.chainId) && this.currentAccount;
     return this.hasConnected;
   }
 

@@ -25,7 +25,7 @@ export class InjectedConnector extends BaseConnector {
   constructor(args = []) {
     super(args)
 
-    this.handleNetworkChanged = this.handleNetworkChanged.bind(this)
+    // this.handleNetworkChanged = this.handleNetworkChanged.bind(this)
     this.handleChainChanged = this.handleChainChanged.bind(this)
     this.handleAccountsChanged = this.handleAccountsChanged.bind(this)
     this.handleClose = this.handleClose.bind(this)
@@ -48,9 +48,9 @@ export class InjectedConnector extends BaseConnector {
     this.emitDeactivate()
   }
 
-  handleNetworkChanged(networkId) {
-    this.emitUpdate({ chainId: networkId, provider: window.ethereum })
-  }
+  // handleNetworkChanged(networkId) {
+  //   this.emitUpdate({ chainId: networkId, provider: window.ethereum })
+  // }
 
   async activate() {
     if (!window.ethereum) {
@@ -61,7 +61,7 @@ export class InjectedConnector extends BaseConnector {
       window.ethereum.on('chainChanged', this.handleChainChanged)
       window.ethereum.on('accountsChanged', this.handleAccountsChanged)
       window.ethereum.on('close', this.handleClose)
-      window.ethereum.on('networkChanged', this.handleNetworkChanged)
+      // window.ethereum.on('networkChanged', this.handleNetworkChanged)
     }
 
     if (window.ethereum.isMetaMask) {

@@ -53,6 +53,7 @@ import { connectWallet } from "hooks/wallet";
 import { WALLET_TYPE } from "constants/wallet"
 import { ConnectorEvents } from '../../connector/base/types'
 import { getWallet, setWallet } from '../../utils/storage'
+import { SUPPORT_CHAIN } from "../../constants/index";
 // import { ChainId } from "@uniswap/sdk";
 const moduleWallet = namespace("moduleWallet");
 
@@ -82,25 +83,66 @@ export default class ConnectionTip extends Vue {
   }
 
   async handleConnect(walletType = this.walletType.MetaMask) {
-    const connector = await connectWallet(walletType);
-    this.setCurrentWallet(walletType)
-    setWallet(walletType)
+    connectWallet(walletType)
+      .then(connector => {
+        this.setCurrentWallet(walletType)
+        setWallet(walletType)
 
-    // add wallet event listener
-    connector.on(ConnectorEvents.Update, this.update);
-    connector.on(ConnectorEvents.Deactivate, this.deactivate);
-    connector.on(ConnectorEvents.Error, this.error);
+        // add wallet event listener
+        connector.on(ConnectorEvents.Update, this.update);
+        connector.on(ConnectorEvents.Deactivate, this.deactivate);
+        connector.on(ConnectorEvents.Error, this.error);
 
-    const account = await connector.getAccount()
-    const chainId = await connector.getChainId()
+        // get account
+        const getAccountPromise = connector.getAccount()
 
-    this.setAccount(account)
-    this.setChainId(Number(chainId))
-    this.setConnected(true)
+        // get chainid
+        const getChainIdPromise = connector.getChainId()
+
+        Promise.all([getAccountPromise, getChainIdPromise])
+          .then(res => {
+            const account = res[0]
+            const chainId = res[1]
+            if(!account || !chainId) {
+              this.deactivate("Unknown error")
+              return
+            }
+            if(Number(SUPPORT_CHAIN) !== Number(chainId)) {
+              this.reportChainIdNotSupportError()
+              return
+            }
+
+            this.setAccount(account)
+            this.setChainId(Number(chainId))
+            this.setConnected(true)
+          })
+          .catch(err => {
+            this.deactivate(err)
+            close(connector)
+          })
+      })
+      .catch(err => {
+        this.deactivate(err)
+      })
+  }
+
+  reportChainIdNotSupportError() {
+    const err = "The network supported by your wallet does not match the current network"
+    this.$message.error(err)
+    setWallet(WALLET_TYPE.Unknown)
+    this.setConnected(false);
   }
 
   update(e) {
+    console.log(`Update: ${e}`)
+    if(!this.hasConnected) {
+      return
+    }
     if(e.chainId){
+      if(Number(SUPPORT_CHAIN) !== Number(e.chainId)) {
+        this.reportChainIdNotSupportError()
+        return;
+      }
       this.setChainId(Number(e.chainId))
     } else {
       this.setAccount(e.account)
@@ -108,7 +150,8 @@ export default class ConnectionTip extends Vue {
   }
 
   deactivate(e) {
-    console.log("Disconnet from wallet: ", e)
+    this.$message.error("An error occurred, disconnect from wallet")
+    console.error("Disconnet from wallet: ", e)
     this.setConnected(false);
     this.setAccount("")
     this.setChainId("")
@@ -117,6 +160,10 @@ export default class ConnectionTip extends Vue {
 
   error(e) {
     console.log("Error", e)
+  }
+
+  close(connector) {
+    connector.deactivate()
   }
 }
 </script>
