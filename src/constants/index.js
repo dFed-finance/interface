@@ -7,7 +7,7 @@ export const MINT_USDD_OFFSET = 0.01
 export const DEFAULT_TOLERANCE = 0.5 // 0.5%
 export const DEFAULT_DEADLINE = 20 // minutes
 
-export const START_REWARD_BLOCK = 11450000
+export const START_REWARD_BLOCK = 9200500
 
 export const APPROVE_MAX = true
 
@@ -18,7 +18,7 @@ export const FEE_BASE = 10000
 // Supported networkid
 // MainNet: 1
 // Ropsten: 3
-export const SUPPORT_CHAIN = 1
+export const SUPPORT_CHAIN = 3
 
 // MainNet: 1
 // Ropsten: 3
@@ -35,12 +35,12 @@ export const INIT_CODE_HASH = '0x1e13bfabd55c4a55728b1a04dd97db523e33af14aecddc9
 
 // Addresses
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
-export const USDD_ADDRESS = '0xe6ec2f01348067e7b064a0503a47b93e038cce9f'
-export const USDT_ADDRESS = '0xdac17f958d2ee523a2206206994597c13d831ec7'
-export const FED_ADDRESS = '0xd750d799fcbf8a5ed8ba39d01afdd4091775a504'
-export const INDEX_ADDRESS = '0x99629185c647757f131fe84a84c554ad87fcdad7'
-export const FACTORY_ADDRESSES = '0xca4eb662fd17b6c275ab0b93bdd0bc252c07556e'
-export const CREATOR_ADDRESS = '0x29900fffaffefed16fb52a1d04f4d6d8cd469316'
+export const USDD_ADDRESS = '0x903dd0f1d0e4854fcd01bff2aeb8a91265656ae7'
+export const USDT_ADDRESS = '0xe6bc3de4528cdd61258e7c41f1112d2ab34da55f'
+export const FED_ADDRESS = '0xaa5c55e80a1fe90015d06e1ac28b3a7676f3d985'
+export const INDEX_ADDRESS = '0xa7020a810a5bb8e7e847540b4e319cfb8b4e0697'
+export const FACTORY_ADDRESSES = '0x4fc051bed871b5f956e978414fd645b020301231'
+export const CREATOR_ADDRESS = '0x82e6fcbbd2587f7635edf72e3237e626f8000bc1'
 
 export const STORE_TRACKED_TOKENS = 'tokens'
 export const STORE_DEBTS = 'debts'
