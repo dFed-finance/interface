@@ -23,7 +23,7 @@ export const SUPPORT_CHAIN = 1
 // MainNet: 1
 // Ropsten: 3
 export const INIT_DATA = {
-  3: []
+  1: []
 }
 
 // Infura ID
