@@ -1,4 +1,4 @@
-import ethers from 'ethers'
+import { ethers } from 'ethers'
 
 import FACTORY_ABI from '../constants/abis/factory'
 import INDEX_ABI from '../constants/abis/index'
