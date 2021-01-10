@@ -18,7 +18,7 @@ export const FEE_BASE = 10000
 // Supported networkid
 // MainNet: 1
 // Ropsten: 3
-export const SUPPORT_CHAIN = 3
+export const SUPPORT_CHAIN = 1
 
 // MainNet: 1
 // Ropsten: 3
