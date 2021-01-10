@@ -36,7 +36,6 @@ export class InjectedConnector extends BaseConnector {
   }
 
   handleAccountsChanged(accounts) {
-    console.log(this)
     if (accounts.length === 0) {
       this.emitDeactivate()
     } else {

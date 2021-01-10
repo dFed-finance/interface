@@ -706,8 +706,6 @@ export default class Swap extends Vue {
             return;
           }
           this.pairAddress = pairAddress;
-          console.log(this.usddToken)
-          console.log(this.otherToken)
           getPairFromToken(this.usddToken, this.otherToken, pairAddress).then(
             pair => {
               this.pair = pair;

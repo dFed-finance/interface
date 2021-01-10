@@ -181,7 +181,6 @@ export default class RemoveLiquidity extends Vue {
     }
     this.usddToken = this.params.tokenA;
     this.otherToken = this.params.tokenB;
-    console.log(this.params.Credit);
     this.creditValue = Number(this.params.Credit);
 
     // Token Amount

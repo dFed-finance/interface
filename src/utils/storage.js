@@ -4,6 +4,7 @@ import { WALLET_TYPE } from '../constants/wallet'
 const toleranceKey = "dfed_tolerance"
 const deadlineKey = "dfed_deadline"
 const walletKey = "dfed_wallet"
+const walletConnectKey = "walletconnect"
 
 
 export function storeToken(key, token, chainId) {
@@ -84,4 +85,8 @@ export function getWallet() {
   } else {
     return cur
   }
+}
+
+export function removeWalletConnectCache() {
+  localStorage.removeItem(walletConnectKey);
 }

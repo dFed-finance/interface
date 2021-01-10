@@ -93,7 +93,6 @@ export class WalletConnectConnector extends BaseConnector {
   }
 
   async getProvider() {
-    console.log(this.walletConnectProvider)
     return this.walletConnectProvider
   }
 

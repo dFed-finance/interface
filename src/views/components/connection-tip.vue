@@ -52,7 +52,7 @@ import { namespace } from "vuex-class";
 import { connectWallet } from "hooks/wallet";
 import { WALLET_TYPE } from "constants/wallet"
 import { ConnectorEvents } from '../../connector/base/types'
-import { getWallet, setWallet } from '../../utils/storage'
+import { getWallet, setWallet, removeWalletConnectCache } from '../../utils/storage'
 import { SUPPORT_CHAIN } from "../../constants/index";
 // import { ChainId } from "@uniswap/sdk";
 const moduleWallet = namespace("moduleWallet");
@@ -74,6 +74,7 @@ export default class ConnectionTip extends Vue {
   connectLoading
 
   walletType = WALLET_TYPE
+  globalConnector;
 
   created() {
     const cacheWallet = getWallet();
@@ -85,6 +86,7 @@ export default class ConnectionTip extends Vue {
   async handleConnect(walletType = this.walletType.MetaMask) {
     connectWallet(walletType)
       .then(connector => {
+        this.globalConnector = connector;
         this.setCurrentWallet(walletType)
         setWallet(walletType)
 
@@ -130,11 +132,16 @@ export default class ConnectionTip extends Vue {
     const err = "The network supported by your wallet does not match the current network"
     this.$message.error(err)
     setWallet(WALLET_TYPE.Unknown)
-    this.setConnected(false);
+    this.setConnected(false)
+    this.setAccount("")
+    this.setChainId("")
+    this.removeListener()
+    // for walletconnect
+    removeWalletConnectCache()
   }
 
   update(e) {
-    console.log(`Update: ${e}`)
+    console.log(e)
     if(!this.hasConnected) {
       return
     }
@@ -155,11 +162,22 @@ export default class ConnectionTip extends Vue {
     this.setConnected(false);
     this.setAccount("")
     this.setChainId("")
+    this.removeListener()
     setWallet(WALLET_TYPE.Unknown)
+    // for walletconnect
+    removeWalletConnectCache()
   }
 
   error(e) {
-    console.log("Error", e)
+    console.error(e)
+  }
+
+  removeListener() {
+    if(this.globalConnector){
+      this.globalConnector.removeListener(ConnectorEvents.Update, this.update)
+      this.globalConnector.removeListener(ConnectorEvents.Error, this.error)
+      this.globalConnector.removeListener(ConnectorEvents.Deactivate, this.deactivate)
+    }
   }
 
   close(connector) {

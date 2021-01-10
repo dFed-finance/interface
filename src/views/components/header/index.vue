@@ -10,13 +10,13 @@
 
       <el-tag type="success" class="m_b5" v-if="networkName">{{networkName}}</el-tag>
 
-      <el-button
+      <!-- <el-button
         round
         v-if="!hasConnected"
         size="medium"
         class="m_l10 m_b5"
         @click="handleConnect"
-      >Connect to a wallet</el-button>
+      >Connect to a wallet</el-button> -->
       <span class="c_pointer account m_b5">
         <el-tag class="ellipsis m_l10 w_max150" v-if="hasConnected">
           <div id="clipboard-btn"  :data-clipboard-text="currentAccount">
@@ -131,10 +131,6 @@ export default class Header extends Vue {
         this.$message.error('Copy failed')
       })
     });
-  }
-
-  handleConnect(walletType) {
-    // This func should show the wallet tip page
   }
 }
 </script>

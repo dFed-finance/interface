@@ -35,9 +35,7 @@ export async function connectWallet(walletType) {
   }
   connector = abstracConnector;
   // connet to wallet
-  console.log(111)
   await connector.activate()
-  console.log(222)
   provider = await connector.getProvider()
   // get web3Provider
   provider = new providers.Web3Provider(provider);
@@ -45,7 +43,6 @@ export async function connectWallet(walletType) {
 }
 
 export function getChainId() {
-  console.log(connector.getChainId())
   const provider = window.ethereum
   return provider.request({ method: 'eth_chainId' })
 }
