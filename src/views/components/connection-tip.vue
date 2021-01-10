@@ -18,7 +18,7 @@
             @click="handleConnect(walletType.MetaMask)"
           >
             <span>
-              <span class="status" :class="currentAccount ? 'open':'close'" />
+              <span class="status" :class="currentWallet === 'metamask' ? 'open':'close'" />
               MetaMask
             </span>
             <icon name="metamask" class-name="f_s18" />
@@ -30,7 +30,7 @@
             @click="handleConnect(walletType.WalletConnect)"
           >
             <span>
-              <span class="status" :class="currentAccount ? 'open':'close'" />
+              <span class="status" :class="currentWallet === 'walletconnect' ? 'open':'close'" />
               WalletConnect
             </span>
             <img class="wallet-img" src="~assets/img/wallet-connect.png" />
@@ -166,6 +166,7 @@ export default class ConnectionTip extends Vue {
     setWallet(WALLET_TYPE.Unknown)
     // for walletconnect
     removeWalletConnectCache()
+    this.setCurrentWallet(WALLET_TYPE.Unknown)
   }
 
   error(e) {
